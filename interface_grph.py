@@ -15,6 +15,7 @@ class MainWindow(QMainWindow):
         widget.setLayout(grid)
 
         host = QLabel("host :")
+        self.__label2 = QLabel("")
         self.__text = QLineEdit("")
         port = QLabel("port :")
         self.__text2 = QLineEdit("")
@@ -32,20 +33,23 @@ class MainWindow(QMainWindow):
         grid.addWidget(cmd,2,0)
         grid.addWidget(self.__text3, 2, 1)
         grid.addWidget(conn, 2,3)
+        grid.addWidget(self.__label2, 3,0)
 
 
-        conn.clicked.connect(self._actionconn)
+        conn.clicked.connect(self._actioncmd)
         # # choix.currentTextChanged().connect(self._actionChoix)
         # aide.clicked.connect(self._actionAide)
 
         self.setWindowTitle("SAE3.02")
 
-    def _actionconn(self):
+    def _actioncmd (self):
+        self.__lab2.setText(f"Bonjour {self.__text.text()}")
 
 
     def _connexion(self):
         host= '127.0.0.1'
         port= 12000
+
 
 
 

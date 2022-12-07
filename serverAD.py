@@ -31,9 +31,8 @@ def serveur():
         server_socket.close()
         print ("Server closed")
 
-
 def commande(msg):
-
+    cmd = msg.split(':')
     if msg == "DOS:dir" :
         cmd = 'dir'
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850', shell=True)
