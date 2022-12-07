@@ -47,14 +47,18 @@ class MainWindow(QMainWindow):
 
 
     def _connexion(self):
-        host= '127.0.0.1'
-        port= 12000
+
+        host=
+        port=
 
 
+
+    def _actionQuitter(self):
+        QCoreApplication.exit(0)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MainWindow(host="",port="")
+    window = MainWindow()
     window.show()
     app.exec()
