@@ -1,4 +1,4 @@
-import socket, threading, sys
+import socket, threading
 import sys
 from threading import Lock
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLabel, QLineEdit, QPushButton
@@ -54,5 +54,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(sys.argv)
 
-    Client.connect()
+    test=Client('localhost',14000)
+    test2=Client()
+    Client.connect(test)
     Client.dialogue()
