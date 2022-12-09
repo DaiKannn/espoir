@@ -216,16 +216,8 @@ class MainWindow(QMainWindow):
         QCoreApplication.exit(0)
         # par exemple accès la socket
 
-
-
-
     def _actionQuitter(self):
         QCoreApplication.exit(0)
-
-
-
-
-
 
 if __name__ == "__main__":
     # print(sys.argv)

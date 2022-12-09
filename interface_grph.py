@@ -36,9 +36,9 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.__label2, 3,0)
 
 
-        conn.clicked.connect(self._actioncmd)
+        cmd.clicked.connect(self._actioncmd)
         # # choix.currentTextChanged().connect(self._actionChoix)
-        # aide.clicked.connect(self._actionAide)
+        conn.clicked.connect(self._actionconn)
 
         self.setWindowTitle("SAE3.02")
 
@@ -46,10 +46,9 @@ class MainWindow(QMainWindow):
         self.__lab2.setText(f"Bonjour {self.__text.text()}")
 
 
-    def _connexion(self):
-
-        host=
-        port=
+    # def _actionconn(self):
+    #     host=
+    #     port=
 
 
 
@@ -59,6 +58,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow('localhost',14000)
     window.show()
     app.exec()
