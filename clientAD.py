@@ -1,4 +1,4 @@
-import threading
+import threading, socket
 import sys
 from threading import Lock
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLabel, QLineEdit, QPushButton
@@ -14,17 +14,20 @@ class Client():
         self.__thread = None
 
     def connect(self) -> int:
-        try :
-            self.__sock.connect((self.__host,self.__port))
+        try:
+            self.__sock.connect((self.__host, self.__port))
         except ConnectionRefusedError:
-            print ("[X] Serveur non lancé ou mauvaise information")
+            print("[X] Serveur non lancé ou mauvaise information")
             return -1
         except ConnectionError:
-            print ("[X] Erreur de connection")
+            print("[X] Erreur de connection")
             return -1
-        else :
-            print ("[+] Connexion réalisée")
+        else:
+            print("[+] Connexion réalisée")
             return 0
+
+    def connexion(self):
+        self.__sock.connect((self.__host, self.__port))
 
     def dialogue(self):
         msg = ""
@@ -51,14 +54,12 @@ class Client():
 
 class MainWindow(QMainWindow):
     def __init__(self):
-
         super().__init__()
-
         widget = QWidget()
         self.setCentralWidget(widget)
-
         grid = QGridLayout()
         widget.setLayout(grid)
+        lab = QLabel("Host")
 
         host = QLabel("host :")
         self.__label2 = QLabel("")
@@ -68,6 +69,8 @@ class MainWindow(QMainWindow):
         cmd = QLabel("Commande :")
         self.__text3 = QLineEdit("")
         conn = QPushButton("Connexion")
+        send = QPushButton("Envoyer")
+        self.__client = None
 
         # Ajouter les composants au grid ayout
 
@@ -79,28 +82,34 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.__text3, 2, 1)
         grid.addWidget(conn, 2, 3)
         grid.addWidget(self.__label2, 3, 0)
+        grid.addWidget(send, 4, 0)
+        self.__text.setText("127.0.0.1")
+        self.__text2.setText("14000")
 
         conn.clicked.connect(self._actionconn)
+        conn.clicked.connect(self._actioncmd)
 
         self.setWindowTitle("SAE3.02")
 
     def _actioncmd(self):
-        self.__lab2.setText(f"Bonjour {self.__text.text()} | {self.__text2.text()}")
+        msg = self.__text3.text()
+        self.__client.envoi(msg)
+        self.__lab2.setText(f"{self.__client.dialogue(msg)}")
+        self.__lab3.setText(f"Commande  : {msg}\n")
 
     def _actionconn(self):
-        self.__lab3.setText(f"Bonjour {self.__text.text()}")
         host=str(self.__text.text())
         port=int(self.__text2.text())
-        client= Client(host, port)
-        client.connect()
-        client.diaglogue()
-        QCoreApplication.exit(0)
+        self.__client = Client(host, port)
+        self.__client.connexion()
+
 
 
     def _actionQuitter(self):
         QCoreApplication.exit(0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
