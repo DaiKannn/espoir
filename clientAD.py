@@ -77,13 +77,13 @@ class MainWindow(QMainWindow):
         self.__text5 = QLineEdit("")
         self.__text6 = QLineEdit("")
         self.__text = QLineEdit("")
+        self.__label5 = QLabel("Ajouter un Host :")
+        self.__label6 = QPushButton("Ajouter")
         self.__cmd.hide()
         self.__send.hide()
         self.__text3.hide()
         self.__lab3.hide()
         self.__deco.hide()
-
-
 
         self.__client = None
 
@@ -96,17 +96,16 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.__cmd, 4, 0)
         grid.addWidget(self.__text3, 5, 1)
         grid.addWidget(self.__conn, 3, 3)
-        grid.addWidget(self.__send, 5, 2)
+        grid.addWidget(self.__send, 5, 3)
         grid.addWidget(self.__label3, 6, 0)
         grid.addWidget(self.__text4, 6, 1)
-        grid.addWidget(self.__label4, 6,3)
+        grid.addWidget(self.__label4, 6, 3)
         grid.addWidget(self.__labtitre, 0, 1)
-        grid.addWidget(self.__lab3, 6,1,1,5)
-        grid.addWidget(self.__deco,3,3)
-        grid.addWidget(self.__text5, 8 ,1)
-
-
-
+        grid.addWidget(self.__lab3, 6, 1, 1, 5)
+        grid.addWidget(self.__deco, 3, 3)
+        grid.addWidget(self.__text5, 8, 1)
+        grid.addWidget(self.__label5, 8, 0)
+        grid.addWidget(self.__label6, 8, 3)
 
 
         self.__text2.setText("14000")
@@ -136,12 +135,15 @@ class MainWindow(QMainWindow):
         self.__text4.hide()
         self.__conn.hide()
         self.__deco.show()
+        self.__label5.hide()
+        self.__label6.hide()
+        self.__text5.hide()
 
 
 
     def _newfichier(self):
-        testest = self.__text5.text()
-        file = open(f"{testest}", "a")
+        ip = self.__text5.text()
+        file = open(f"{ip}", "a")
         file.write(f"\n{self.__text6.text()}")
         self.__text.addItem(self.__text6.text())
         self.__text6.setText("")
@@ -160,4 +162,5 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     app.exec()
+
 
