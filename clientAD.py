@@ -37,7 +37,7 @@ class Client():
         except:
             print("RIP")
 
-    def __envoi(self,msg):
+    def envoi(self,msg):
         self.__sock.send(msg.encode())
         rep = self.__sock.recv(32000).decode()
         return rep
@@ -67,13 +67,13 @@ class MainWindow(QMainWindow):
         self.__cmd = QLabel("Commande :")
         self.__text3 = QLineEdit("")
         self.__conn = QPushButton("Connexion")
-        self.__deco= QPushButton("Déconnexion")
+        self.__deco = QPushButton("Déconnexion")
         self.__send = QPushButton("Envoyer")
         self.__lab3 = QTextEdit(self)
         self.__label3 = QLabel("Choisir un fichier :")
         self.__label4 = QPushButton("Choisir")
         self.__text4 = QLineEdit("")
-        self.__labtitre = QLabel("SAE3.02")
+        self.__labtitre = QLabel("Grievous400 je t'aime")
         self.__labtitre.setAlignment(Qt.AlignCenter)
         self.__labtitre.setFont(QFont('Arial', 30))
         self.__text5 = QLineEdit("")
@@ -114,7 +114,7 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.__fichier, 9, 2)
 
 
-        self.__text2.setText("14000")
+        self.__text2.setText("10006")
 
         self.__conn.clicked.connect(self._actionconn)
         self.__send.clicked.connect(self._actioncmd)
@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
             o = QFileDialog.options
             o = QFileDialog.DontUseNativeDialog
             name = QFileDialog.getOpenFileNames(self,"Choisir un fichier", "Fichier texte (*txt)", options=o)
-            ip = pathlib.Path(name).Name
+            ip = pathlib.Path(name).name
             self.__text6.setText(name)
             file1 = open(f"{ip}", 'r')
             Lines = file1.readlines()
@@ -180,11 +180,11 @@ class MainWindow(QMainWindow):
             for line in Lines:
                 count += 1
                 self.__text.addItem(line.strip())
-            self.__btnadd.setEnabled(True)
-            self.__text10.show()
-            self.__labadd.show()
-            self.__btnadd.show()
-            self.__okcon.setEnabled(True)
+            self.__label6.setEnabled(True)
+            self.__text5.show()
+            self.__label5.show()
+            self.__label6.show()
+            self.__conn.setEnabled(True)
 
         except:
             msg = QMessageBox()
@@ -208,5 +208,4 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     app.exec()
-
 

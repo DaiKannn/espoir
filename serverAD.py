@@ -2,6 +2,8 @@ import socket
 import sys
 import subprocess
 import platform
+from ipaddress import IPv4Network
+
 import psutil
 
 def serveur():
@@ -9,7 +11,7 @@ def serveur():
     while msg != "kill" :
         msg = ""
         server_socket = socket.socket()
-        server_socket.bind(("0.0.0.0", 14000))
+        server_socket.bind(("0.0.0.0", 10006))
         server_socket.listen(1)
 
         print('Serveur en attente de connexion')
@@ -30,35 +32,36 @@ def serveur():
                             conn.send(f"{platform.system()}".encode())
 
                         elif msg == 'CPU':
-                            nbr_cpu = psutil.cpu_count()
-                            cpus = psutil.cpu_percent()
-                            cpusfinal = str(cpus)
-                            conn.send(
-                                f"Nombre de CPU logiques dans le système : {nbr_cpu}, Utilisation de tous les CPU : {cpusfinal}%".encode())
+                            cpup = psutil.cpu_percent()
+                            cpu = str(cpup)
+                            conn.send(f"Utilisation des CPU : {cpu} % .".encode())
+
+                        elif msg == 'Nb CPU':
+                            nbcpu = psutil.cpu_count()
+                            conn.send(f"Nombre de CPU {nbcpu}".encode())
 
 
-                        elif msg == 'RAM':
-                            meminfo = psutil.virtual_memory()
-                            total = round(meminfo.total / 1_073_741_824, 2)
-                            utilise = round(meminfo.used / 1_073_741_824, 2)
-                            disponible = round(meminfo.free / 1_073_741_824, 2)
-                            conn.send(
-                                f"Total de RAM : {total} Go, RAM utilsé : {utilise} Go, RAM disponible : {disponible} Go".encode())
+                        elif msg == 'RAM utilisé':
+                            memuse = psutil.virtual_memory().percent
+                            conn.send(f" RAM utilsé : {memuse} Go".encode())
 
+                        elif msg == 'RAM restante':
+                            memrest = psutil.virtual_memory().available * 100/ psutil.virtual_memory().total
+                            conn.send(f"Ram restante : {memrest} Go.".encode())
 
                         elif msg == 'IP':
                             ipa = []
                             for nic, addrs in psutil.net_if_addrs().items():
                                 for addr in addrs:
                                     address = addr.address
-                                    if addr.family == AF_INET and not address.startswith("169.254"):
+                                    if addr.family == socket.AF_INET and not address.startswith("169.254"):
                                         ipa.append(f"{address}/{IPv4Network('0.0.0.0/' + addr.netmask).prefixlen}")
                             ipfinal = str(ipa)[1:-1]
                             conn.send(f"IP de la machine : {ipfinal}".encode())
 
 
                         elif msg == 'Name':
-                            conn.send(f"Nom de la machine : {platform.node()}".encode())
+                            conn.send(f"Nom de la machine : {socket.gethostname()}".encode())
 
 
 
