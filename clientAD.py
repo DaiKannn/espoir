@@ -1,11 +1,12 @@
+import pathlib
 import threading, socket
 import sys
 from threading import Lock
 
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLabel, QLineEdit, QPushButton, QComboBox, \
-    QTextEdit
-from PyQt5.QtCore import QCoreApplication
+    QTextEdit, QMessageBox, QFileDialog
+from PyQt5.QtCore import QCoreApplication, Qt
 from serverAD import *
 
 
@@ -69,21 +70,25 @@ class MainWindow(QMainWindow):
         self.__deco= QPushButton("Déconnexion")
         self.__send = QPushButton("Envoyer")
         self.__lab3 = QTextEdit(self)
-        self.__label3 = QLabel("Nom de Fichier :")
-        self.__label4 = QPushButton("Utiliser")
+        self.__label3 = QLabel("Choisir un fichier :")
+        self.__label4 = QPushButton("Choisir")
         self.__text4 = QLineEdit("")
         self.__labtitre = QLabel("SAE3.02")
+        self.__labtitre.setAlignment(Qt.AlignCenter)
         self.__labtitre.setFont(QFont('Arial', 30))
         self.__text5 = QLineEdit("")
         self.__text6 = QLineEdit("")
         self.__text = QLineEdit("")
         self.__label5 = QLabel("Ajouter un Host :")
         self.__label6 = QPushButton("Ajouter")
+        self.__fichier = QLineEdit("")
         self.__cmd.hide()
         self.__send.hide()
         self.__text3.hide()
         self.__lab3.hide()
         self.__deco.hide()
+        self.__fichier.hide()
+        self.__nc = None
 
         self.__client = None
 
@@ -106,6 +111,7 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.__text5, 8, 1)
         grid.addWidget(self.__label5, 8, 0)
         grid.addWidget(self.__label6, 8, 3)
+        grid.addWidget(self.__fichier, 9, 2)
 
 
         self.__text2.setText("14000")
@@ -118,8 +124,12 @@ class MainWindow(QMainWindow):
 
     def _actioncmd(self):
         msg = self.__text3.text()
-        rep = self.__client.envoi(msg)
-        self.__lab3.append(f"{rep}\n")
+        try:
+            rep = self.__client.envoi(msg)
+        except:
+            self.__lab3.append(f"Erreur\n")
+        else:
+            self.__lab3.append(f"{rep}\n")
 
     def _actionconn(self):
         host=str(self.__ip.currentText())
@@ -139,18 +149,54 @@ class MainWindow(QMainWindow):
         self.__label6.hide()
         self.__text5.hide()
 
-
+    def _newco(self):
+        self.__nc = MainWindow()
+        self.__nc.show()
 
     def _newfichier(self):
-        ip = self.__text5.text()
-        file = open(f"{ip}", "a")
-        file.write(f"\n{self.__text6.text()}")
-        self.__text.addItem(self.__text6.text())
-        self.__text6.setText("")
+        if self.__text5.text() != "":
+            ip = self.__text6.text()
+            file = open(f"{ip}", "a")
+            file.write(f"\n{self.__text5.text()}")
+            self.__text.addItem(self.__text5.text())
+            self.__text5.setText("")
+            self.__savefichier = self.__text6.text()
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Erreur")
+
+    def _nmfichier(self):
+        try :
+            o = QFileDialog.options
+            o = QFileDialog.DontUseNativeDialog
+            name = QFileDialog.getOpenFileNames(self,"Choisir un fichier", "Fichier texte (*txt)", options=o)
+            ip = pathlib.Path(name).Name
+            self.__text6.setText(name)
+            file1 = open(f"{ip}", 'r')
+            Lines = file1.readlines()
+
+            count = 0
+
+            for line in Lines:
+                count += 1
+                self.__text.addItem(line.strip())
+            self.__btnadd.setEnabled(True)
+            self.__text10.show()
+            self.__labadd.show()
+            self.__btnadd.show()
+            self.__okcon.setEnabled(True)
+
+        except:
+            msg = QMessageBox()
+            msg.setWindowTitle("Erreur")
+
+
 
 
     def _actiondeco(self):
-        self._actionconn.exit(0)
+        self.__client.envoi("disconnect")
+        self.__client.envoi("disconnect")
+        QCoreApplication.exit(0)
 
 
     def _actionQuitter(self):
