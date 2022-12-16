@@ -29,7 +29,7 @@ def serveur():
                         msg = conn.recv(1024).decode()
                         print ("Received from client: ", msg)
                         if msg == 'OS':
-                            conn.send(f"{platform.system()}".encode())
+                            conn.send(f"{platform.platform()}".encode())
 
                         elif msg == 'CPU':
                             cpup = psutil.cpu_percent()
@@ -50,14 +50,14 @@ def serveur():
                             conn.send(f"Ram restante : {memrest} Go.".encode())
 
                         elif msg == 'IP':
-                            ipa = []
+                            ip = []
                             for nic, addrs in psutil.net_if_addrs().items():
                                 for addr in addrs:
                                     address = addr.address
                                     if addr.family == socket.AF_INET and not address.startswith("169.254"):
-                                        ipa.append(f"{address}/{IPv4Network('0.0.0.0/' + addr.netmask).prefixlen}")
-                            ipfinal = str(ipa)[1:-1]
-                            conn.send(f"IP de la machine : {ipfinal}".encode())
+                                        ip.append(f"{address}/{IPv4Network('0.0.0.0/' + addr.netmask).prefixlen}")
+                            ipé = str(ip)[1:-1]
+                            conn.send(f"IP de la machine : {ipé}".encode())
 
 
                         elif msg == 'Name':
@@ -67,37 +67,43 @@ def serveur():
 
                         elif msg == 'Connexion information':
                             conn.send(
-                                f"Le nom de la machine est {platform.node()}, son IP est la suivante : {socket.gethostbyname(socket.gethostname())}".encode())
+                                f"La machine a pour nom {platform.node()}, son IP est : {socket.gethostbyname(socket.gethostname())}".encode())
 
 
 
                         elif msg[0:4] == "Linux:":
                             if sys.platform == 'linux':
-                                divise = msg.split(':')[1]
-                                resultat = subprocess.check_output(divise, shell=True).decode('cp850')
-                                conn.send(f"Commande {divise} : {resultat}".encode())
+                                eucli = msg.split(':')[1]
+                                som = subprocess.check_output(eucli, shell=True).decode('cp850')
+                                conn.send(f"Commande {eucli} : {som}".encode())
                             else:
-                                conn.send("Commande échouée : OS inadéquat".encode())
+                                conn.send("La commande a échoué. Ce n'est pas le bon OS.".encode())
 
 
                         elif msg[0:4] == "DOS:":
                             if sys.platform == 'win32':
-                                divise = msg.split(':')[1]
-                                resultat = subprocess.check_output(divise, shell=True).decode('cp850')
-                                conn.send(f"Commande {divise} : {resultat}".encode())
+                                eucli = msg.split(':')[1]
+                                som = subprocess.check_output(eucli, shell=True).decode('cp850')
+                                conn.send(f"Commande {eucli} : {som}".encode())
                             else:
-                                conn.send("Commande échouée : OS inadéquat".encode())
+                                conn.send("La commande a échoué. Ce n'est pas le bon OS.".encode())
 
 
                         elif msg == "python --version":
-                            python = subprocess.getoutput('python --version')
-                            conn.send(f"La version de python est la suivante : {python}".encode())
+                            pv = subprocess.getoutput('python --version')
+                            conn.send(f"Nous sommes sur : {pv}".encode())
 
 
                         elif msg[0:4] == 'ping':
-                            p = msg.split(' ')
-                            destinataire = p[1]
-                            conn.send(subprocess.getoutput('ping ' + destinataire).encode())
+                            ping = msg.split(' ')
+                            send = ping[1]
+                            conn.send(subprocess.getoutput('ping ' + send).encode())
+
+                        elif msg == "kill" or msg == "reset" or msg == "disconnect":
+                            conn.send(msg.encode())
+                        else:
+                            reply = "Cela ne corespond pas à une commande, veuillez entrer une commande !"
+                            conn.send(reply.encode())
                 except ConnectionResetError:
                     print("")
                 except KeyboardInterrupt:

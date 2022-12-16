@@ -3,9 +3,9 @@ import threading, socket
 import sys
 from threading import Lock
 
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QKeySequence
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLabel, QLineEdit, QPushButton, QComboBox, \
-    QTextEdit, QMessageBox, QFileDialog
+    QTextEdit, QMessageBox, QFileDialog, QShortcut
 from PyQt5.QtCore import QCoreApplication, Qt
 from serverAD import *
 
@@ -62,7 +62,6 @@ class MainWindow(QMainWindow):
 
 
         self.__ip = QComboBox()
-        self.__ip.addItem("127.0.0.1")
         self.__text2 = QLineEdit("")
         self.__cmd = QLabel("Commande :")
         self.__text3 = QLineEdit("")
@@ -72,21 +71,21 @@ class MainWindow(QMainWindow):
         self.__lab3 = QTextEdit(self)
         self.__label3 = QLabel("Choisir un fichier :")
         self.__label4 = QPushButton("Choisir")
-        self.__text4 = QLineEdit("")
         self.__labtitre = QLabel("SAE3.02")
         self.__labtitre.setAlignment(Qt.AlignCenter)
         self.__labtitre.setFont(QFont('Arial', 30))
         self.__text5 = QLineEdit("")
         self.__text6 = QLineEdit("")
-        self.__text = QComboBox()
         self.__label5 = QLabel("Ajouter un Host :")
         self.__label6 = QPushButton("Ajouter")
-        self.__fichier = QLineEdit("")
+        self.__label6.hide()
         self.__label6.setEnabled(False)
+        self.__fichier = QLineEdit("")
         self.__conn.setEnabled(False)
         self.__text8 = QLineEdit("")
         self.__text6.setReadOnly(True)
         self.__lab3.setReadOnly(True)
+        self.__newclient = QPushButton("Nouveau Client")
         self.__cmd.hide()
         self.__send.hide()
         self.__text3.hide()
@@ -95,10 +94,12 @@ class MainWindow(QMainWindow):
         self.__fichier.hide()
         self.__text5.hide()
         self.__nc = None
-
         self.__client = None
 
-        # Ajouter les composants au grid ayout
+        self.shortcut_raccourci = QShortcut(QKeySequence('Return'), self)
+        self.shortcut_raccourci.activated.connect(self._actioncmd)
+        self.shortcut_raccourci = QShortcut(QKeySequence('Enter'), self)
+        self.shortcut_raccourci.activated.connect(self._actioncmd)
 
         grid.addWidget(host, 1, 0)
         grid.addWidget(port, 1, 2)
@@ -109,7 +110,6 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.__conn, 3, 3)
         grid.addWidget(self.__send, 5, 3)
         grid.addWidget(self.__label3, 6, 0)
-        grid.addWidget(self.__text4, 6, 1)
         grid.addWidget(self.__label4, 6, 3)
         grid.addWidget(self.__labtitre, 0, 1)
         grid.addWidget(self.__lab3, 6, 1, 1, 5)
@@ -118,6 +118,9 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.__label5, 8, 0)
         grid.addWidget(self.__label6, 8, 3)
         grid.addWidget(self.__fichier, 9, 2)
+        grid.addWidget(self.__text6, 6, 1)
+        grid.addWidget(self.__newclient, 0,7)
+
 
 
         self.__text2.setText("10006")
@@ -127,6 +130,7 @@ class MainWindow(QMainWindow):
         self.__deco.clicked.connect(self._actiondeco)
         self.__label4.clicked.connect(self._nmfichier)
         self.__label6.clicked.connect(self._nvhost)
+        self.__newclient.clicked.connect(self._newclient)
 
         self.setWindowTitle("SAE3.02")
 
@@ -151,14 +155,15 @@ class MainWindow(QMainWindow):
         self.__text3.show()
         self.__label3.hide()
         self.__label4.hide()
-        self.__text4.hide()
         self.__conn.hide()
         self.__deco.show()
         self.__label5.hide()
         self.__label6.hide()
         self.__text5.hide()
+        self.__text6.hide()
+        self.__newclient.hide()
 
-    def _newco(self):
+    def _newclient(self):
         self.__nc = MainWindow()
         self.__nc.show()
 
@@ -167,7 +172,7 @@ class MainWindow(QMainWindow):
             ip = self.__text6.text()
             file = open(f"{ip}", "a")
             file.write(f"\n{self.__text5.text()}")
-            self.__text.addItem(self.__text5.text())
+            self.__ip.addItem(self.__text5.text())
             self.__text5.setText("")
             self.__fichier = self.__text6.text()
         else:
@@ -183,14 +188,14 @@ class MainWindow(QMainWindow):
             settings |= QFileDialog.DontUseNativeDialog
             nom, _ = QFileDialog.getOpenFileName(self, "Choisissez votre fichier", "","Fichiers Texte (*.txt)", options=settings)
             ip = pathlib.Path(nom).name
-            self.__text8.setText(nom)
+            self.__text6.setText(nom)
             file1 = open(f"{ip}", 'r')
             Lines = file1.readlines()
 
             count = 0
             for line in Lines:
                 count += 1
-                self.__text.addItem(line.strip())
+                self.__ip.addItem(line.strip())
 
             self.__label6.setEnabled(True)
             self.__conn.setEnabled(True)
@@ -207,7 +212,6 @@ class MainWindow(QMainWindow):
             x = msg.exec_()
 
     def _actiondeco(self):
-        self.__client.envoi("disconnect")
         self.__client.envoi("disconnect")
         QCoreApplication.exit(0)
 
