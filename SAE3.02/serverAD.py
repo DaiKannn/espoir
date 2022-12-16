@@ -3,7 +3,6 @@ import sys
 import subprocess
 import platform
 from ipaddress import IPv4Network
-
 import psutil
 
 def serveur():
@@ -21,7 +20,7 @@ def serveur():
                 conn, addr = server_socket.accept()
                 print (addr)
             except ConnectionError:
-                print ("erreur de connection")
+                print ("erreur de connexion")
                 break
             else :
                 try:

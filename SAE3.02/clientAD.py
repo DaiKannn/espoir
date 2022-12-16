@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
         else:
             msg = QMessageBox()
             msg.setWindowTitle("Erreur")
-            msg.setText("Impossible d'ajouter un host vide")
+            msg.setText("Il est impossible d'ajouter un host vide ! ")
             msg.setIcon(QMessageBox.Critical)
             x = msg.exec_()
 
@@ -207,7 +207,7 @@ class MainWindow(QMainWindow):
         except:
             msg = QMessageBox()
             msg.setWindowTitle("Erreur")
-            msg.setText("Erreur ! Vous avez fermer la fenêtre sans selectionner de fichier ")
+            msg.setText(" Vous n'avez choisi de fichier. Veuillez en choisir un ! ")
             msg.setIcon(QMessageBox.Critical)
             x = msg.exec_()
 
@@ -215,10 +215,8 @@ class MainWindow(QMainWindow):
         self.__client.envoi("disconnect")
         QCoreApplication.exit(0)
 
-
     def _actionQuitter(self):
         QCoreApplication.exit(0)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
