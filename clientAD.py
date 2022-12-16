@@ -73,21 +73,27 @@ class MainWindow(QMainWindow):
         self.__label3 = QLabel("Choisir un fichier :")
         self.__label4 = QPushButton("Choisir")
         self.__text4 = QLineEdit("")
-        self.__labtitre = QLabel("Grievous400 je t'aime")
+        self.__labtitre = QLabel("SAE3.02")
         self.__labtitre.setAlignment(Qt.AlignCenter)
         self.__labtitre.setFont(QFont('Arial', 30))
         self.__text5 = QLineEdit("")
         self.__text6 = QLineEdit("")
-        self.__text = QLineEdit("")
+        self.__text = QComboBox()
         self.__label5 = QLabel("Ajouter un Host :")
         self.__label6 = QPushButton("Ajouter")
         self.__fichier = QLineEdit("")
+        self.__label6.setEnabled(False)
+        self.__conn.setEnabled(False)
+        self.__text8 = QLineEdit("")
+        self.__text6.setReadOnly(True)
+        self.__lab3.setReadOnly(True)
         self.__cmd.hide()
         self.__send.hide()
         self.__text3.hide()
         self.__lab3.hide()
         self.__deco.hide()
         self.__fichier.hide()
+        self.__text5.hide()
         self.__nc = None
 
         self.__client = None
@@ -119,6 +125,8 @@ class MainWindow(QMainWindow):
         self.__conn.clicked.connect(self._actionconn)
         self.__send.clicked.connect(self._actioncmd)
         self.__deco.clicked.connect(self._actiondeco)
+        self.__label4.clicked.connect(self._nmfichier)
+        self.__label6.clicked.connect(self._nvhost)
 
         self.setWindowTitle("SAE3.02")
 
@@ -130,6 +138,7 @@ class MainWindow(QMainWindow):
             self.__lab3.append(f"Erreur\n")
         else:
             self.__lab3.append(f"{rep}\n")
+            self.__text3.clear()
 
     def _actionconn(self):
         host=str(self.__ip.currentText())
@@ -153,45 +162,49 @@ class MainWindow(QMainWindow):
         self.__nc = MainWindow()
         self.__nc.show()
 
-    def _newfichier(self):
+    def _nvhost(self):
         if self.__text5.text() != "":
             ip = self.__text6.text()
             file = open(f"{ip}", "a")
             file.write(f"\n{self.__text5.text()}")
             self.__text.addItem(self.__text5.text())
             self.__text5.setText("")
-            self.__savefichier = self.__text6.text()
+            self.__fichier = self.__text6.text()
         else:
             msg = QMessageBox()
             msg.setWindowTitle("Erreur")
+            msg.setText("Impossible d'ajouter un host vide")
+            msg.setIcon(QMessageBox.Critical)
+            x = msg.exec_()
 
     def _nmfichier(self):
-        try :
-            o = QFileDialog.options
-            o = QFileDialog.DontUseNativeDialog
-            name = QFileDialog.getOpenFileNames(self,"Choisir un fichier", "Fichier texte (*txt)", options=o)
-            ip = pathlib.Path(name).name
-            self.__text6.setText(name)
+        try:
+            settings = QFileDialog.Options()
+            settings |= QFileDialog.DontUseNativeDialog
+            nom, _ = QFileDialog.getOpenFileName(self, "Choisissez votre fichier", "","Fichiers Texte (*.txt)", options=settings)
+            ip = pathlib.Path(nom).name
+            self.__text8.setText(nom)
             file1 = open(f"{ip}", 'r')
             Lines = file1.readlines()
 
             count = 0
-
             for line in Lines:
                 count += 1
                 self.__text.addItem(line.strip())
+
             self.__label6.setEnabled(True)
+            self.__conn.setEnabled(True)
+
             self.__text5.show()
             self.__label5.show()
             self.__label6.show()
-            self.__conn.setEnabled(True)
 
         except:
             msg = QMessageBox()
             msg.setWindowTitle("Erreur")
-
-
-
+            msg.setText("Erreur ! Vous avez fermer la fenêtre sans selectionner de fichier ")
+            msg.setIcon(QMessageBox.Critical)
+            x = msg.exec_()
 
     def _actiondeco(self):
         self.__client.envoi("disconnect")
@@ -208,4 +221,3 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     app.exec()
-
